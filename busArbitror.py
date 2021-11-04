@@ -60,7 +60,7 @@ class BusArbitror(object):
         '''Return the microcycle and macrocycle from a period table'''
         def ppcm(values):
             '''Helper to compute the Least Commom Multiple'''
-            return reduce(lambda a, b: a * b // gcd(a, b), values)
+            return reduce(lambda x, y: x * y // gcd(x, y), values)
         return (min(table.values()), ppcm(table.values()))
 
 
