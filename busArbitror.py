@@ -36,10 +36,9 @@ class BusArbitror(object):
             if tmp != tmp2:
                 tmp2 = tmp
                 sleep(self._microcycle  / 1000)
-                print("tmp = {} ms").format(tmp)
-
+                print(f"tmp = {tmp} ms")
             # Sent the message over the bus
-            print('\tSending  message : [{}]').format(msg)
+            print(f'\tSending  message : [{msg}]')
             self.send_msg(msg.get_repr())
             sleep((3 * _RT)  / 1000)
 
