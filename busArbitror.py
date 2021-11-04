@@ -6,14 +6,8 @@ from itertools import cycle
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SO_REUSEPORT
 from frame import ID_Dat
 
-
-def msleep(sec):
-    sleep(sec / 1000)
-
-
+#DEFINE RETURN TIME
 _RT = 50
-
-
 class BusArbitror(object):
     '''
     Représente un arbitre de bus du protocol World-FIP
@@ -41,13 +35,13 @@ class BusArbitror(object):
         for tmp, msg in cycle(self.list_macrocycle()):
             if tmp != tmp2:
                 tmp2 = tmp
-                msleep(self._microcycle)
-                print(f'tmp = {tmp}ms')
+                sleep(self._microcycle  / 1000)
+                print("tmp = {} ms").format(tmp)
 
             # Sent the message over the bus
-            print(f'\tsending {msg}')
+            print('\tSending  message : [{}]').format(msg)
             self.send_msg(msg.get_repr())
-            msleep(3 * _RT)
+            sleep((3 * _RT)  / 1000)
 
     def list_macrocycle(self):
         '''

@@ -4,11 +4,7 @@ from argparse import ArgumentParser
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SO_REUSEPORT
 from frame import RP_Dat, ID_Dat
 
-
-def msleep(sec):
-    sleep(sec / 1000)
-
-
+#DEFINING RETURN TIME
 _RT = 50
 
 
@@ -44,7 +40,7 @@ class Producer(object):
                 continue
 
             # 3. Send back the object to the bus
-            msleep(_RT)
+            sleep(_RT  / 1000)
             rp_dat = RP_Dat(self._data)
             print(f'sending {rp_dat}')
             self.send_rp_dat(rp_dat)
