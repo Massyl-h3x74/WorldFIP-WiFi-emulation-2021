@@ -37,12 +37,12 @@ class BusArbitror(object):
         '''
         Loop over all messages and schedule IDs according to the table
         '''
-        t2 = None
-        for t, msg in cycle(self.list_macrocycle()):
-            if t != t2:
-                t2 = t
+        tmp2 = None
+        for tmp, msg in cycle(self.list_macrocycle()):
+            if tmp != tmp2:
+                tmp2 = tmp
                 msleep(self._microcycle)
-                print(f't = {t}ms')
+                print(f'tmp = {tmp}ms')
 
             # Sent the message over the bus
             print(f'\tsending {msg}')
@@ -55,11 +55,11 @@ class BusArbitror(object):
 
         return a tuple `(time, Frame)`
         '''
-        for t in range(0, self._macrocycle, self._microcycle):
+        for tmp in range(0, self._macrocycle, self._microcycle):
             # Loop over the table to see what message should be send
             for id, period in self._table.items():
-                if t % period == 0:
-                    yield (t, ID_Dat(id))
+                if tmp % period == 0:
+                    yield (tmp, ID_Dat(id))
 
     @staticmethod
     def cycles_from_table(table):
