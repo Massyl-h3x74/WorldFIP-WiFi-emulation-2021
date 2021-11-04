@@ -9,7 +9,7 @@ def msleep(sec):
     sleep(sec / 1000)
 
 
-RETURN_TIME = 50
+_RT = 50
 
 
 class Producer(object):
@@ -44,7 +44,7 @@ class Producer(object):
                 continue
 
             # 3. Send back the object to the bus
-            msleep(RETURN_TIME)
+            msleep(_RT)
             rp_dat = RP_Dat(self._data)
             print(f'sending {rp_dat}')
             self.send_rp_dat(rp_dat)

@@ -11,7 +11,7 @@ def msleep(sec):
     sleep(sec / 1000)
 
 
-RETURN_TIME = 50
+_RT = 50
 
 
 class BusArbitror(object):
@@ -47,7 +47,7 @@ class BusArbitror(object):
             # Sent the message over the bus
             print(f'\tsending {msg}')
             self.send_msg(msg.get_repr())
-            msleep(3 * RETURN_TIME)
+            msleep(3 * _RT)
 
     def list_macrocycle(self):
         '''

@@ -9,7 +9,7 @@ def msleep(sec):
     sleep(sec / 1000)
 
 
-RETURN_TIME = 50
+_RT = 50
 
 
 class Consumer(object):
@@ -34,7 +34,7 @@ class Consumer(object):
 
     def recv_rp_dat(self):
         old_to = self._socket.gettimeout()
-        self._socket.settimeout(2 * RETURN_TIME / 1000)
+        self._socket.settimeout(2 * _RT / 1000)
         try:
             data, addr = self._socket.recvfrom(RP_Dat.size())
         finally:
@@ -56,7 +56,7 @@ class Consumer(object):
                 continue
 
             # 4. Get the object from the bus
-            msleep(RETURN_TIME)
+            msleep(_RT)
             try:
                 ok, rp_dat = self.recv_rp_dat()
             except:
