@@ -18,27 +18,27 @@ class Consumer(object):
         self._data = None
 
     def run_server(self, port=5432):
-        self._sock = socket(AF_INET, SOCK_DGRAM)
-        self._sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self._sock.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-        self._sock.bind(('', port))
-        self._port = port
+        self._socket = socket(AF_INET, SOCK_DGRAM)
+        self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        self._socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+        self._socket.bind(('', port))
+        self.port = port
 
     def recv_id_dat(self, data=None):
         if not data:
-            data, addr = self._sock.recvfrom(ID_Dat.size())
+            data, addr = self._socket.recvfrom(ID_Dat.size())
         try:
             return ID_Dat.from_repr(data)
         except:
-            return None
+            return "Data not recieved"
 
     def recv_rp_dat(self):
-        old_to = self._sock.gettimeout()
-        self._sock.settimeout(2 * RETURN_TIME / 1000)
+        old_to = self._socket.gettimeout()
+        self._socket.settimeout(2 * RETURN_TIME / 1000)
         try:
-            data, addr = self._sock.recvfrom(RP_Dat.size())
+            data, addr = self._socket.recvfrom(RP_Dat.size())
         finally:
-            self._sock.settimeout(old_to)
+            self._socket.settimeout(old_to)
 
         try:
             return (True, RP_Dat.from_repr(data))

@@ -18,17 +18,17 @@ class Producer(object):
         self._data = data
 
     def run_server(self, port=5432):
-        self._sock = socket(AF_INET, SOCK_DGRAM)
-        self._sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self._sock.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-        self._sock.bind(('', port))
-        self._port = port
+        self._socket = socket(AF_INET, SOCK_DGRAM)
+        self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        self._socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+        self._socket.bind(('', port))
+        self.port = port
 
     def send_rp_dat(self, msg: RP_Dat):
-        self._sock.sendto(msg.get_repr(), ('<broadcast>', self._port))
+        self._socket.sendto(msg.get_repr(), ('<broadcast>', self.port))
 
     def recv_id_dat(self):
-        data, addr = self._sock.recvfrom(ID_Dat.size())
+        data, addr = self._socket.recvfrom(ID_Dat.size())
         try:
             return ID_Dat.from_repr(data)
         except:

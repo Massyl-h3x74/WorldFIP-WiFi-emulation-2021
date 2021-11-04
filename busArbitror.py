@@ -23,15 +23,15 @@ class BusArbitror(object):
         self._microcycle, self._macrocycle = self.cycles_from_table(table)
 
     def run_server(self, port=5432):
-        self._sock = socket(AF_INET, SOCK_DGRAM)
-        self._sock.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self._sock.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
-        self._sock.settimeout(0)
-        self._sock.bind(('', port))
-        self._port = port
+        self._socket = socket(AF_INET, SOCK_DGRAM)
+        self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        self._socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
+        self._socket.settimeout(0)
+        self._socket.bind(('', port))
+        self.port = port
 
     def send_msg(self, msg: bytes):
-        self._sock.sendto(msg, ('<broadcast>', self._port))
+        self._socket.sendto(msg, ('<broadcast>', self.port))
 
     def do_loop(self):
         '''
