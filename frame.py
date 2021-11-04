@@ -2,28 +2,17 @@ import struct
 from abc import ABC, abstractmethod
 
 
-class Frame(ABC):
+class Frame():
     DEFAULT_INIT_SEQUENCE = 42  # à définir : séquence de début de trame sur 2 octets
     DEFAULT_END_SEQUENCE = b'\042'  # à définir : séquence de fin de trame sur 1 octets
 
     def __init__(self, type: bytes):
+
+
         self._init_sequence = self.DEFAULT_INIT_SEQUENCE
         self._end_sequence = self.DEFAULT_END_SEQUENCE
         assert len(type) == 1, 'The type of a frame must be one byte'
         self._type = type
-
-    def __repr__(self):
-        return str(self.__dict__)
-
-    @abstractmethod
-    def get_repr(self):
-        pass
-
-    @classmethod
-    @abstractmethod
-    def from_repr(cls, repr: bytes):
-        raise NotImplementedError('Frame does not exists, use a concrete frame instead')
-
 
 class ID_Dat(Frame):
     '''
@@ -44,14 +33,12 @@ class ID_Dat(Frame):
         vals = (self._init_sequence, self._type, self._id, self._end_sequence)
         return struct.pack(fmt, *vals)
 
-    @classmethod
     def from_repr(cls, repr: bytes):
         fmt = f'hchc'
         _, type, id, _ = struct.unpack(fmt, repr)
         assert type == cls.TYPE, f'Bad frame type, expected {cls.TYPE}, got {type}'
         return cls(id)
 
-    @classmethod
     def size(cls):
         '''The ID_Dat frame is represented with 7 bytes'''
         return 7
@@ -84,7 +71,6 @@ class RP_Dat(Frame):
         vals = (self._init_sequence, self._type, self.data, self._end_sequence)
         return struct.pack(fmt, *vals)
 
-    @classmethod
     def from_repr(cls, repr: bytes):
         fmt = f'hc{0}sc'
         size = len(repr) - struct.calcsize(fmt)
@@ -93,16 +79,8 @@ class RP_Dat(Frame):
         assert type == cls.TYPE, 'Bad frame type'
         return cls(data)
 
-
-
-    @classmethod
     def size(cls):
-        '''The RP_Dat frame is represented with 5 + `n` bytes where `n` vary'''
-        return 6 + 128
-    
-    @classmethod
-    def size_two(cls):
-        '''The RP_Dat frame is represented with 5 + `n` bytes where `n` vary'''
+        # The RP_Dat frame is represented with 5 + `n` bytes where `n` >= 128 
         return 6 + 128
 
 
