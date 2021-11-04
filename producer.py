@@ -40,7 +40,7 @@ class Producer(object):
                 continue
 
             # 3. Send back the object to the bus
-            sleep(_RT  / 1000)
+            sleep(_RT / 1000)
             rp_dat = RP_Dat(self._data)
             print(f'sending {rp_dat}')
             self.send_rp_dat(rp_dat)
