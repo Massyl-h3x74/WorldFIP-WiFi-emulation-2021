@@ -64,19 +64,21 @@ class BusArbitror(object):
     @staticmethod
     def cycles_from_table(table):
         '''Return the microcycle and macrocycle from a period table'''
-        def lcm(numbers):
+        def ppcm(values):
             '''Helper to compute the Least Commom Multiple'''
-            return reduce(lambda a, b: a * b // gcd(a, b), numbers)
-        return (min(table.values()), lcm(table.values()))
+            return reduce(lambda a, b: a * b // gcd(a, b), values)
+        return (min(table.values()), ppcm(table.values()))
 
 
 if __name__ == '__main__':
-    bus = BusArbitror({
+    table = {
         101: 100 * 10,
         102: 200 * 10,
         103: 500 * 10,
         104: 100 * 10,
         105: 200 * 10,
-    })
+    }
+
+    bus = BusArbitror(table)
     bus.run_server()
     bus.do_loop()
