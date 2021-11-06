@@ -7,7 +7,7 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SO_REU
 from frame import ID_Dat
 
 #DEFINE RETURN TIME
-_RT = 50
+_RETURN_TIME = 50
 class BusArbitror(object):
     '''
     Représente un arbitre de bus du protocol World-FIP
@@ -16,31 +16,31 @@ class BusArbitror(object):
         self._table = table
         self._microcycle, self._macrocycle = self.cycles_from_table(table)
 
-    def run_server(self, port=5432):
+    def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self._socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
         self._socket.settimeout(0)
         self._socket.bind(('', port))
-        self.port = port
+        self._port = port
 
-    def send_msg(self, msg: bytes):
-        self._socket.sendto(msg, ('<broadcast>', self.port))
+    def send_data(self, data: bytes):
+        self._socket.sendto(data, ('<broadcast>', self._port))
 
-    def do_loop(self):
+    def loop_init(self):
         '''
         Loop over all messages and schedule IDs according to the table
         '''
         tmp2 = None
-        for tmp, msg in cycle(self.list_macrocycle()):
+        for tmp, data in cycle(self.list_macrocycle()):
             if tmp != tmp2:
                 tmp2 = tmp
                 sleep(self._microcycle  / 1000)
                 print(f"tmp = {tmp} ms")
             # Sent the message over the bus
-            print(f'\tSending [{msg}]')
-            self.send_msg(msg.get_repr())
-            sleep((3 * _RT)  / 1000)
+            print(f'\tSending [{data}]')
+            self.send_data(data.get_repr())
+            sleep((3 * _RETURN_TIME)  / 1000)
 
     def list_macrocycle(self):
         '''
@@ -73,6 +73,6 @@ if __name__ == '__main__':
     }
 
     bus = BusArbitror(table)
-    bus.run_server()
-    bus.do_loop()
+    bus.server_init()
+    bus.loop_init()
 

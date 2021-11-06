@@ -5,19 +5,19 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SO_REU
 from frame import RP_Dat, ID_Dat
 
 #DEFINING RETURN TIME
-_RT = 50
+_RETURN_TIME = 50
 
 class Consumer(object):
     def __init__(self, id: int):
         self._id = id
         self._data = None
 
-    def run_server(self, port=5432):
+    def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self._socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
         self._socket.bind(('', port))
-        self.port = port
+        self._port = port
 
     def recv_id_dat(self, data=None):
         if not data:
@@ -29,7 +29,7 @@ class Consumer(object):
 
     def recv_rp_dat(self):
         old_to = self._socket.gettimeout()
-        self._socket.settimeout(2 * _RT / 1000)
+        self._socket.settimeout(2 * _RETURN_TIME / 1000)
         try:
             data, addr = self._socket.recvfrom(RP_Dat.size())
         finally:
@@ -40,7 +40,7 @@ class Consumer(object):
         except:
             return (False, data)
 
-    def do_loop(self):
+    def loop_init(self):
         data = None
         while True:
             # 1. Get the ID_Dat, use the existing one if exists
@@ -51,18 +51,18 @@ class Consumer(object):
                 continue
 
             # 4. Get the object from the bus
-            sleep(_RT  / 1000)
+            sleep( _RETURN_TIME  / 1000)
             try:
                 ok, rp_dat = self.recv_rp_dat()
             except:
-                print('timeout reached, ignoring')
+                print('Timeout reached, ignoring...')
                 continue
             if not ok:
                 data = rp_dat
                 continue
 
             # 4.5 It worked
-            print(f'received: {rp_dat}')
+            print(f'Received: DATA=[{rp_dat}]')
 
 
 def parse_args():
@@ -74,5 +74,5 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     prod = Consumer(args.id)
-    prod.run_server()
-    prod.do_loop()
+    prod.server_init()
+    prod.loop_init()

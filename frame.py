@@ -1,18 +1,19 @@
 import struct
-from abc import ABC, abstractmethod
-
-
+from abc import ABC
+from random import seed
+from random import randint
 class Frame(ABC):
-    DEFAULT_INIT_SEQUENCE = 42  # à définir : séquence de début de trame sur 2 octets
-    DEFAULT_END_SEQUENCE = b'\042'  # à définir : séquence de fin de trame sur 1 octets
+    # Frame INIT sequence / 2 bytes /
+    DEFAULT_FRAME_INIT_SEQ = 0x7F
+
+    # Frame END sequence / 1 byte /
+    DEFAULT_FRAME_END_SEQ = b'\x7F'
 
     def __init__(self, type: bytes):
-
-
-        self._init_sequence = self.DEFAULT_INIT_SEQUENCE
-        self._end_sequence = self.DEFAULT_END_SEQUENCE
-        assert len(type) == 1, 'The type of a frame must be one byte'
-        self._type = type
+        self._FrameInitSeq = self.DEFAULT_FRAME_INIT_SEQ
+        self._FrameEndSeq = self.DEFAULT_FRAME_END_SEQ
+        assert len(type) == 1, 'The Frame TYPE must be 01 byte'
+        self._FrameType = type
 
     def __repr__(self):
         return str(self.__dict__)
@@ -21,7 +22,7 @@ class ID_Dat(Frame):
     '''
     Trame envoyée par l'arbitre de bus pour indiqué l'objet à transmettre
     '''
-    TYPE = b'I'
+    TYPE = b'\x01'
 
     def __init__(self, id: int, *args, **kwargs):
         super().__init__(self.TYPE, *args, **kwargs)
@@ -33,7 +34,7 @@ class ID_Dat(Frame):
 
     def get_repr(self):
         fmt = f'hchc'
-        vals = (self._init_sequence, self._type, self._id, self._end_sequence)
+        vals = (self._FrameInitSeq, self._FrameType, self._id, self._FrameEndSeq)
         return struct.pack(fmt, *vals)
 
     @classmethod
@@ -53,7 +54,7 @@ class RP_Dat(Frame):
     '''
     Trame envoyée par les producteur en réponse à une trame ID_Dat
     '''
-    TYPE = b'D'
+    TYPE = b'\x8F'
 
     def __init__(self, data: bytes, *args, **kwargs):
         super().__init__(self.TYPE, *args, **kwargs)
@@ -73,7 +74,7 @@ class RP_Dat(Frame):
 
     def get_repr(self):
         fmt = f'hc{len(self._data)}sc'
-        vals = (self._init_sequence, self._type, self.data, self._end_sequence)
+        vals = (self._FrameInitSeq, self._FrameType, self.data, self._FrameEndSeq)
         return struct.pack(fmt, *vals)
 
     @classmethod
@@ -89,27 +90,24 @@ class RP_Dat(Frame):
 
     @classmethod
     def size(cls):
-        '''The RP_Dat frame is represented with 5 + `n` bytes where `n` vary'''
-        return 6 + 128
-
-    @classmethod
-    def size_two(cls):
-        '''The RP_Dat frame is represented with 5 + `n` bytes where `n` vary'''
+        '''The RP_Dat frame is represented with 5 + `n` bytes where `1 <= n <= 128`'''
         return 6 + 128
 
 
 if __name__ == '__main__':
-    # f = Frame()
-    f1 = ID_Dat(666)
-    print(f1)
-    r = f1.get_repr()
-    f2 = type(f1).from_repr(r)
-    print(f2)
+    # f = Frame(0xD0A12FF7EFFC)
+    value = 0x0001
+    frame_01 = ID_Dat(value)
+    print(frame_01)
+    reps = frame_01.get_repr()
+    frame_02 = type(frame_01).from_repr(reps)
+    print(frame_02)
 
     print('===============')
 
-    f1 = RP_Dat(b'0123456789')
-    print(f1)
-    r = f1.get_repr()
-    f2 = type(f1).from_repr(r)
-    print(f2)
+    value = 0xD0A12FF7EFFC
+    frame_01 = RP_Dat(b'{value}')
+    print(frame_01)
+    reps = frame_01.get_repr()
+    frame_02 = type(frame_01).from_repr(reps)
+    print(frame_02)

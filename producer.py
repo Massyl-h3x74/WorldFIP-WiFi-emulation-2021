@@ -5,7 +5,7 @@ from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SO_REU
 from frame import RP_Dat, ID_Dat
 
 #DEFINING RETURN TIME
-_RT = 50
+_RETURN_TIME = 50
 
 
 class Producer(object):
@@ -13,15 +13,15 @@ class Producer(object):
         self._id = id
         self._data = data
 
-    def run_server(self, port=5432):
+    def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self._socket.setsockopt(SOL_SOCKET, SO_REUSEPORT, 1)
         self._socket.bind(('', port))
-        self.port = port
+        self._port = port
 
-    def send_rp_dat(self, msg: RP_Dat):
-        self._socket.sendto(msg.get_repr(), ('<broadcast>', self.port))
+    def send_rp_dat(self, data: RP_Dat):
+        self._socket.sendto(data.get_repr(), ('<broadcast>', self._port))
 
     def recv_id_dat(self):
         data, addr = self._socket.recvfrom(ID_Dat.size())
@@ -30,7 +30,7 @@ class Producer(object):
         except:
             return None
 
-    def do_loop(self):
+    def loop_init(self):
         while True:
             # 1. Get the ID_Dat
             id_dat = self.recv_id_dat()
@@ -40,21 +40,21 @@ class Producer(object):
                 continue
 
             # 3. Send back the object to the bus
-            sleep(_RT / 1000)
+            sleep(_RETURN_TIME / 1000)
             rp_dat = RP_Dat(self._data)
-            print(f'sending {rp_dat}')
+            print(f'Sending: [{rp_dat}]')
             self.send_rp_dat(rp_dat)
 
 
 def parse_args():
     parser = ArgumentParser()
     parser.add_argument('id', type=int)
-    parser.add_argument('msg', default='tititata', nargs='?')
+    parser.add_argument('data', default='0xD0A12FF7EFFC', nargs='?')
     return parser.parse_args()
 
 
 if __name__ == '__main__':
     args = parse_args()
-    prod = Producer(args.id, bytes(args.msg, 'utf-8'))
-    prod.run_server()
-    prod.do_loop()
+    prod = Producer(args.id, bytes(args.data, 'utf-8'))
+    prod.server_init()
+    prod.loop_init()

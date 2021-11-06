@@ -12,15 +12,10 @@ LED = 7 #Définit le numéro du port GPIO qui alimente la led
 
 GPIO.setup(LED, GPIO.OUT) #Active le contrôle du GPIO
 
-
-
-
 def msleep(sec):
     sleep(sec / 1000)
 
-
 RETURN_TIME = 50
-
 
 class Producer(object):
     def __init__(self, id: int, data: bytes):
@@ -69,7 +64,7 @@ def parse_args():
     return parser.parse_args()
 
 
-if _name_ == '_main_':
+if __name__ == '__main__':
     args = parse_args()
     prod = Producer(args.id, bytes(args.msg, 'utf-8'))
     prod.run_server()
