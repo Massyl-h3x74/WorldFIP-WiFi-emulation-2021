@@ -4,6 +4,16 @@ from argparse import ArgumentParser
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SO_REUSEPORT
 from frame import RP_Dat, ID_Dat
 
+import RPi.GPIO as GPIO #Importe la bibliothèque pour contrôler les GPIOs
+
+GPIO.setmode(GPIO.BOARD) #Définit le mode de numérotation (Board)
+GPIO.setwarnings(False) #On désactive les messages d'alerte
+
+RED_LED = 7 #Définit le numéro du port GPIO qui alimente la led
+GREEN_LED = 11
+GPIO.setup(RED_LED, GPIO.OUT) #Active le contrôle du GPIO
+GPIO.setup(GREEN_LED, GPIO.OUT) #Active le contrôle du GPIO
+
 #DEFINING RETURN TIME
 _RETURN_TIME = 50
 
@@ -31,19 +41,31 @@ class Producer(object):
             return None
 
     def loop_init(self):
-        while True:
+        while True:            
+            GPIO.output(RED_LED, GPIO.LOW) #On l’éteint
+            GPIO.output(GREEN_LED,GPIO.HIGH)
             # 1. Get the ID_Dat
             id_dat = self.recv_id_dat()
 
             # 2. Ignore messages for which we are not the producer
             if not id_dat or id_dat.id != self._id:
                 continue
+            state = GPIO.input(RED_LED) #Lit l'état actuel du GPIO, vrai si allumé, faux si éteint
+            if state : #Si GPIO allumé
+                GPIO.output(RED_LED, GPIO.LOW) #On l’étein
+                GPIO.output(GREEN_LED,GPIO.HIGH)
+            else:
+                GPIO.output(GREEN_LED,GPIO.LOW)
+                GPIO.output(RED_LED,GPIO.HIGH)
 
             # 3. Send back the object to the bus
             sleep(_RETURN_TIME / 1000)
             rp_dat = RP_Dat(self._data)
             print(f'Sending: [{rp_dat}]')
             self.send_rp_dat(rp_dat)
+            GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
+            sleep(1)
+            GPIO.output(GREEN_LED,GPIO.LOW)
 
 
 def parse_args():

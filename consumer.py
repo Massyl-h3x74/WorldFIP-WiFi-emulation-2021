@@ -4,6 +4,16 @@ from argparse import ArgumentParser
 from socket import socket, AF_INET, SOCK_DGRAM, SOL_SOCKET, SO_BROADCAST, SO_REUSEPORT
 from frame import RP_Dat, ID_Dat
 
+import RPi.GPIO as GPIO #Importe la bibliothèque pour contrôler les GPIOs
+
+GPIO.setmode(GPIO.BOARD) #Définit le mode de numérotation (Board)
+GPIO.setwarnings(False) #On désactive les messages d'alerte
+
+RED_LED = 7 #Définit le numéro du port GPIO qui alimente la led
+GREEN_LED = 11
+GPIO.setup(RED_LED, GPIO.OUT) #Active le contrôle du GPIO
+GPIO.setup(GREEN_LED, GPIO.OUT) #Active le contrôle du GPIO
+
 #DEFINING RETURN TIME
 _RETURN_TIME = 50
 
@@ -43,12 +53,22 @@ class Consumer(object):
     def loop_init(self):
         data = None
         while True:
+            GPIO.output(RED_LED, GPIO.LOW)
+            GPIO.output(GREEN_LED,GPIO.HIGH)
             # 1. Get the ID_Dat, use the existing one if exists
             id_dat = self.recv_id_dat()
 
             # 2. Ignore messages for which we are not a consumer
             if not id_dat or id_dat.id != self._id:
                 continue
+            
+            state = GPIO.input(RED_LED) #Lit l'état actuel du GPIO, vrai si allumé, faux si éteint
+            if state : #Si GPIO allumé
+                GPIO.output(RED_LED, GPIO.LOW) #On l’étein
+                GPIO.output(GREEN_LED,GPIO.HIGH)
+            else:
+                GPIO.output(GREEN_LED,GPIO.LOW)
+                GPIO.output(RED_LED,GPIO.HIGH)
 
             # 4. Get the object from the bus
             sleep( _RETURN_TIME  / 1000)
@@ -63,6 +83,9 @@ class Consumer(object):
 
             # 4.5 It worked
             print(f'Received: DATA=[{rp_dat}]')
+            GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
+            sleep(1)
+            GPIO.output(GREEN_LED,GPIO.LOW)
 
 
 def parse_args():
