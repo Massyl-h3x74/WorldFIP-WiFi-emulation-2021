@@ -21,7 +21,8 @@ class Consumer(object):
     def __init__(self, id: int):
         self._id = id
         self._data = None
-
+    cons_time = (_RETURN_TIME/4)-3   
+    val = len(RP_Dat.from_repr(data))/2
     def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -52,6 +53,7 @@ class Consumer(object):
 
     def loop_init(self):
         data = None
+        recv_val = RP_Dat.from_repr(data)
         while True:
             GPIO.output(RED_LED, GPIO.LOW)
             GPIO.output(GREEN_LED,GPIO.HIGH)
@@ -83,8 +85,9 @@ class Consumer(object):
 
             # 4.5 It worked
             print(f'Received: DATA=[{rp_dat}]')
-            GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
-            sleep(1)
+            if len(recv_val) >= (val+(val*0.2)):
+                GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
+                sleep(cons_time*0.2)
             GPIO.output(GREEN_LED,GPIO.LOW)
 
 
