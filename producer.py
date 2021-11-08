@@ -23,7 +23,7 @@ class Producer(object):
     def __init__(self, id: int, data: bytes):
         self._id = id
         self._data = data
-    prod_time = _RETURN_TIME/5   
+        self._prod_time = _RETURN_TIME/5
     def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -42,7 +42,7 @@ class Producer(object):
             return None
 
     def loop_init(self):
-        while True:            
+        while True:
             GPIO.output(RED_LED, GPIO.LOW) #On l’éteint
             GPIO.output(GREEN_LED,GPIO.HIGH)
             # 1. Get the ID_Dat
@@ -66,7 +66,7 @@ class Producer(object):
             self.send_rp_dat(rp_dat)
 
             GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
-            sleep(prod_time/10)
+            sleep(self._prod_time/10)
             GPIO.output(GREEN_LED,GPIO.LOW)
 
 

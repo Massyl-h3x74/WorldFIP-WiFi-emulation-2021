@@ -21,8 +21,7 @@ class Consumer(object):
     def __init__(self, id: int):
         self._id = id
         self._data = None
-    cons_time = (_RETURN_TIME/4)-3   
-    val = len(RP_Dat.from_repr(data))/2
+        self._cons_time = (_RETURN_TIME/4)-3
     def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -54,6 +53,7 @@ class Consumer(object):
     def loop_init(self):
         data = None
         recv_val = RP_Dat.from_repr(data)
+        val = len(RP_Dat.from_repr(data))/2
         while True:
             GPIO.output(RED_LED, GPIO.LOW)
             GPIO.output(GREEN_LED,GPIO.HIGH)
@@ -63,7 +63,7 @@ class Consumer(object):
             # 2. Ignore messages for which we are not a consumer
             if not id_dat or id_dat.id != self._id:
                 continue
-            
+
             state = GPIO.input(RED_LED) #Lit l'état actuel du GPIO, vrai si allumé, faux si éteint
             if state : #Si GPIO allumé
                 GPIO.output(RED_LED, GPIO.LOW) #On l’étein
@@ -87,7 +87,7 @@ class Consumer(object):
             print(f'Received: DATA=[{rp_dat}]')
             if len(recv_val) >= (val+(val*0.2)):
                 GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
-                sleep(cons_time*0.2)
+                sleep(self._cons_time*0.2)
             GPIO.output(GREEN_LED,GPIO.LOW)
 
 
