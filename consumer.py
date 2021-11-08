@@ -16,12 +16,13 @@ GPIO.setup(GREEN_LED, GPIO.OUT) #Active le contrôle du GPIO
 
 #DEFINING RETURN TIME
 _RETURN_TIME = 50
+_CONS_TIME = (_RETURN_TIME/4)-3
 
 class Consumer(object):
     def __init__(self, id: int):
         self._id = id
         self._data = None
-        self._cons_time = (_RETURN_TIME/4)-3
+
     def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -87,7 +88,7 @@ class Consumer(object):
             print(f'Received: DATA=[{rp_dat}]')
             if len(recv_val) >= (val+(val*0.2)):
                 GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
-                sleep(self._cons_time*0.2)
+                sleep(_CONS_TIME*0.2)
             GPIO.output(GREEN_LED,GPIO.LOW)
 
 

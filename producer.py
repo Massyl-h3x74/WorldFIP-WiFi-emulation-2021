@@ -16,6 +16,7 @@ GPIO.setup(GREEN_LED, GPIO.OUT) #Active le contrôle du GPIO
 
 #DEFINING RETURN TIME
 _RETURN_TIME = 50
+_PROD_TIME = _RETURN_TIME/5
 
 
 
@@ -23,7 +24,7 @@ class Producer(object):
     def __init__(self, id: int, data: bytes):
         self._id = id
         self._data = data
-        self._prod_time = _RETURN_TIME/5
+
     def server_init(self, port=5432):
         self._socket = socket(AF_INET, SOCK_DGRAM)
         self._socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -66,7 +67,7 @@ class Producer(object):
             self.send_rp_dat(rp_dat)
 
             GPIO.output(RED_LED, GPIO.HIGH) #On l'allume
-            sleep(self._prod_time/10)
+            sleep(_PROD_TIME/10)
             GPIO.output(GREEN_LED,GPIO.LOW)
 
 
